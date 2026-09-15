@@ -1,21 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model version="NetLogo 7.0.4" snapToGrid="true">
-  <code>breed [ patrouilleurs patrouilleur ]
+  <code><![CDATA[breed [ patrouilleurs patrouilleur ]
 
 patrouilleurs-own [
   id
 ]
 
-; Procédure exécutée au chargement pour assigner par défaut la forme "airplane"
-to startup
-  set-default-shape patrouilleurs "airplane"
-end</code>
+patches-own [
+  oisivete ; Temps écoulé depuis la dernière visite d'un agent
+]
+
+to setup
+  clear-all        ; Réinitialise l'environnement (patches, agents, variables)
+  reset-ticks      ; Remet le compteur de temps à 0
+  
+  ; Initialisation des tuiles
+  ask patches [
+    set oisivete 0
+    set plabel oisivete
+  ]
+  
+  ; Création des patrouilleurs selon la valeur sélectionnée dans l'interface
+  create-patrouilleurs nb_patrouilleurs [
+    ; Forme d'avion (si non définie par startup)
+    set shape "airplane"
+    set size 1.2
+    set color yellow
+    
+    ; Affectation de l'identifiant (on utilise leur numéro unique 'who')
+    set id who
+    
+    ; Étiquette contenant son identifiant
+    set label id
+    set label-color white
+    
+    ; Positionnement au centre du monde (0, 0)
+    setxy 9.5 9.5
+  ]
+end
+
+to go
+  ; Arrêt de la simulation quand le nombre maximal de ticks est atteint
+  if ticks >= max_tick [
+    stop
+  ]
+  
+  ; Incrémentation de l'oisiveté pour l'ensemble des tuiles
+  ask patches [
+    set oisivete oisivete + 1
+    set plabel oisivete
+  ]
+  
+  ; Invoque le comportement individuel de chaque patrouilleur
+  ask patrouilleurs [
+    comportement-individuel
+  ]
+  
+  ; Avance la simulation d'un pas
+  tick
+end
+
+to comportement-individuel
+  ; Récupère les 4 tuiles adjacentes orthogonales (Nord, Sud, Est, Ouest)
+  ; Sur les bords, NetLogo ne renvoie que les cases existantes car le monde n'est pas un tore
+  let voisins neighbors4
+  
+  if any? voisins [
+    ; Choix aléatoire d'une tuile parmi les 4 (ou moins si on est sur un bord)
+    let cible one-of voisins
+    
+    ; Oriente la tortue vers la tuile choisie
+    face cible
+    
+    ; Déplace la tortue au centre de cette tuile
+    move-to cible
+    
+    ; Réinitialisation de l'oisiveté sur la tuile courante visitée
+    set oisivete 0
+    set plabel oisivete
+  ]
+end]]></code>
   <widgets>
-    <view x="368" wrappingAllowedX="true" y="10" frameRate="30.0" minPycor="0" height="264" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="true" width="264" tickCounterLabel="ticks" maxPycor="19" updateMode="0" maxPxcor="19" minPxcor="0"></view>
+    <view x="368" wrappingAllowedX="false" y="10" frameRate="30.0" minPycor="0" height="264" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="false" width="264" tickCounterLabel="ticks" maxPycor="19" updateMode="1" maxPxcor="19" minPxcor="0"></view>
     <button x="35" y="30" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="55" display="setup">setup</button>
     <button x="105" y="30" height="40" disableUntilTicks="false" forever="true" kind="Observer" width="55">go</button>
     <button x="170" y="30" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="60" display="go once">go once</button>
-    <chooser x="40" y="165" height="45" variable="nb_patrouilleurs" current="6" display="nb_patrouilleurs" width="120" sizeVersion="0">
+    <chooser x="40" y="165" height="45" variable="nb_patrouilleurs" current="2" display="nb_patrouilleurs" width="120" sizeVersion="0">
       <choice type="double" value="1.0"></choice>
       <choice type="double" value="2.0"></choice>
       <choice type="double" value="4.0"></choice>
@@ -25,6 +95,7 @@ end</code>
       <choice type="double" value="64.0"></choice>
     </chooser>
     <slider x="50" step="1" y="90" max="4000" width="250" display="max_tick" height="50" min="3000" direction="Horizontal" default="3541.0" variable="max_tick"></slider>
+    <monitor x="35" precision="17" y="240" height="60" fontSize="11" width="100" display="Oisiveté max">max [oisivete] of patches</monitor>
   </widgets>
   <info>## WHAT IS IT?
 
