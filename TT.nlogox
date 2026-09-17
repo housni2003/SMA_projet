@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model version="NetLogo 7.0.4" snapToGrid="true">
-  <code><![CDATA[breed [ patrouilleurs patrouilleur ]
+  <code><![CDATA[globals [
+  max-max-idle ; Enregistre la valeur maximale absolue observé
+]
+
+breed [ patrouilleurs patrouilleur ]
 
 patrouilleurs-own [
   id
@@ -13,6 +17,8 @@ patches-own [
 to setup
   clear-all        ; Réinitialise l'environnement (patches, agents, variables)
   reset-ticks      ; Remet le compteur de temps à 0
+  
+  set max-max-idle 0 ; Initialisation du record à 0
   
   ; Initialisation des tuiles
   ask patches [
@@ -56,6 +62,16 @@ to go
     comportement-individuel
   ]
   
+  ; on appelle patrouilleurs avant car ca change l'oisiveté des tuiles 
+  
+  ; Calcul du pire cas instantané MaxIdlet(G)
+  let max-idle-courant max [oisivete] of patches
+  
+  ; Mise à jour de MaxMaxIdle(G) si un nouveau record est atteint
+  if max-idle-courant > max-max-idle [
+    set max-max-idle max-idle-courant
+  ]
+  
   ; Avance la simulation d'un pas
   tick
 end
@@ -66,8 +82,17 @@ to comportement-individuel
   let voisins neighbors4
   
   if any? voisins [
-    ; Choix aléatoire d'une tuile parmi les 4 (ou moins si on est sur un bord)
-    let cible one-of voisins
+    let cible nobody
+    
+    ; Choix de la cible selon la position de l'interrupteur
+    ifelse heuristique? [
+      ; Stratégie heuristique : tuile voisine avec l'oisiveté maximale
+      ; (en cas d'égalité, max-one-of départage au hasard)
+      set cible max-one-of voisins [ oisivete ]
+    ] [
+      ; Stratégie aléatoire : tuile voisine prise au hasard
+      set cible one-of voisins
+    ]
     
     ; Oriente la tortue vers la tuile choisie
     face cible
@@ -96,6 +121,8 @@ end]]></code>
     </chooser>
     <slider x="50" step="1" y="90" max="4000" width="250" display="max_tick" height="50" min="3000" direction="Horizontal" default="3541.0" variable="max_tick"></slider>
     <monitor x="35" precision="17" y="240" height="60" fontSize="11" width="100" display="Oisiveté max">max [oisivete] of patches</monitor>
+    <monitor x="30" precision="17" y="345" height="60" fontSize="11" width="100" display="MaxMaxIdle">max-max-idle</monitor>
+    <switch x="760" y="15" height="40" on="true" variable="heuristique?" width="95" display="heuristique?"></switch>
   </widgets>
   <info>## WHAT IS IT?
 
