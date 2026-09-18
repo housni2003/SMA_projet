@@ -106,11 +106,11 @@ to comportement-individuel
   ]
 end]]></code>
   <widgets>
-    <view x="368" wrappingAllowedX="false" y="10" frameRate="30.0" minPycor="0" height="264" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="false" width="264" tickCounterLabel="ticks" maxPycor="19" updateMode="1" maxPxcor="19" minPxcor="0"></view>
+    <view x="368" wrappingAllowedX="false" y="10" frameRate="30.0" minPycor="0" height="264" showTickCounter="true" patchSize="13.0" fontSize="10" wrappingAllowedY="false" width="264" tickCounterLabel="ticks" maxPycor="19" updateMode="0" maxPxcor="19" minPxcor="0"></view>
     <button x="35" y="30" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="55" display="setup">setup</button>
     <button x="105" y="30" height="40" disableUntilTicks="false" forever="true" kind="Observer" width="55">go</button>
-    <button x="170" y="30" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="60" display="go once">go once</button>
-    <chooser x="40" y="165" height="45" variable="nb_patrouilleurs" current="2" display="nb_patrouilleurs" width="120" sizeVersion="0">
+    <button x="170" y="30" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="60" display="go once">repeat 3000 [ go ]</button>
+    <chooser x="40" y="165" height="45" variable="nb_patrouilleurs" current="6" display="nb_patrouilleurs" width="120" sizeVersion="0">
       <choice type="double" value="1.0"></choice>
       <choice type="double" value="2.0"></choice>
       <choice type="double" value="4.0"></choice>
@@ -123,6 +123,14 @@ end]]></code>
     <monitor x="35" precision="17" y="240" height="60" fontSize="11" width="100" display="Oisiveté max">max [oisivete] of patches</monitor>
     <monitor x="30" precision="17" y="345" height="60" fontSize="11" width="100" display="MaxMaxIdle">max-max-idle</monitor>
     <switch x="760" y="15" height="40" on="true" variable="heuristique?" width="95" display="heuristique?"></switch>
+    <plot x="760" autoPlotX="true" yMax="10.0" autoPlotY="true" yAxis="MaxMaxIdle normalisé" y="90" xMin="0.0" height="175" legend="false" xMax="10.0" yMin="0.0" width="230" xAxis="ticks" display="MaxMaxIdle normalisé">
+      <setup></setup>
+      <update></update>
+      <pen interval="1.0" mode="0" display="default" color="-5298144" legend="true">
+        <setup></setup>
+        <update>plot ((count patrouilleurs / count patches) * max-max-idle)</update>
+      </pen>
+    </plot>
   </widgets>
   <info>## WHAT IS IT?
 
