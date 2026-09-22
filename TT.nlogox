@@ -147,11 +147,32 @@ end]]></code>
   </widgets>
   <info>## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+Ce modèle simule un problème de patrouille multi agents dans un environnement composé d'une grille de 20 x 20 cases.
+
+Plusieurs patrouilleurs se déplacent dans l'environnement afin de visiter régulièrement les différentes cases. Chaque case possède une valeur d'oisiveté qui correspond au nombre de tick écoulés depuis sa dernière visite.
+
+L'objectif du modèle est d'étudier les différentes stratégies de déplacement des patrouilleurs et d'observer l'influence du nombre de patrouilleurs sur la couverture de l'environnement.
+
+
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+L'environnement est constitué de 400 cases organisées en une grille 20 x 20
+
+Le monde n'est pas torique donc un patrouilleur ne peut pas passer d'une bord à l'autre de l'environnement
+
+Au démarrage de la simulation toute les cases ont une oisiveté de 0.
+Les patrouilleurs sont placés au centre de l'environnement.
+
+à chaque pas de simulation : 
+
+-L'oisiveté de chaque case augmente de 1
+- Chaque partrouilleur choisi une case voisine disponible et se déplace dessus (haut, bas, gauche, droite)
+-L'oisiveté de la case visité passe à 0 
+-L'oisiveté maximale est calculée
+-Une verification sur l'oisiveté pendant toute la simulation est faite
+
+
 
 ## HOW TO USE IT
 
