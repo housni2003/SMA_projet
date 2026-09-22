@@ -172,7 +172,13 @@ Les patrouilleurs sont placés au centre de l'environnement.
 -L'oisiveté maximale est calculée
 -Une verification sur l'oisiveté pendant toute la simulation est faite
 
+Le modèle permet d'utiliser différentes stratégies de déplacement 
 
+Tout d'abord le comportement aléatoire qui fait que le patrouilleur choisi aléatoirement l'une des cases voisines
+
+Le comportement heuristique permet au patrouilleur de choisir la case voisine avec la plus grande oisiveté
+
+Et le comportement cognitif permettant d'utiliser une perception globale de l'environnement qui permet de sélectionner la cible en focntion de son utilité et de se déplacer vers elle via le plus court chemin
 
 ## HOW TO USE IT
 
