@@ -57,8 +57,8 @@ to go
     set plabel oisivete
   ]
   
-  ; Exécution du comportement selon l'interrupteur 'cognitif'
-  ifelse cognitif [
+  ; Exécution du comportement selon la variable globale 'strategie'
+  ifelse strategie = "cognitif" [
     foreach (sort patrouilleurs) [
       patrouilleurCourant ->
       reinitialiser-utilite
@@ -67,6 +67,7 @@ to go
       ask patrouilleurCourant [ comportement-cognitif ]
     ]
   ] [
+    ; Comportements réactifs (heuristique locale ou aléatoire)
     ask patrouilleurs [ comportement-reactif ]
   ]
   
@@ -83,7 +84,7 @@ to go
 end
 
 ; -------------------------------------------------------------
-; COMPORTEMENT RÉACTIF (Exercice 3)
+; COMPORTEMENT RÉACTIF (Aléatoire ou Heuristique locale)
 ; -------------------------------------------------------------
 
 to comportement-reactif
@@ -92,8 +93,8 @@ to comportement-reactif
   if any? voisins [
     let cible nobody
     
-    ifelse heuristique? [
-      ; Heuristique : tuile voisine avec l'oisiveté maximale
+    ifelse strategie = "heuristique" [
+      ; Heuristique : tuile voisine orthogonale avec l'oisiveté maximale
       set cible max-one-of voisins [ oisivete ]
     ] [
       ; Aléatoire : tuile voisine prise au hasard
@@ -106,6 +107,10 @@ to comportement-reactif
     reinitialiser-oisivete-courante
   ]
 end
+
+; -------------------------------------------------------------
+; COMPORTEMENT COGNITIF (Planification globale et utilité)
+; -------------------------------------------------------------
 
 to comportement-cognitif
   ; 1. Choix de la tuile maximisant l'utilité (gain - cout)
@@ -168,7 +173,6 @@ end]]></code>
     <slider x="50" step="1" y="90" max="4000" width="250" display="max_tick" height="50" min="3000" direction="Horizontal" default="3077.0" variable="max_tick"></slider>
     <monitor x="35" precision="17" y="240" height="60" fontSize="11" width="100" display="Oisiveté max">max [oisivete] of patches</monitor>
     <monitor x="30" precision="17" y="345" height="60" fontSize="11" width="100" display="MaxMaxIdle">max-max-idle</monitor>
-    <switch x="760" y="15" height="40" on="true" variable="heuristique?" width="95" display="heuristique?"></switch>
     <plot x="760" autoPlotX="true" yMax="10.0" autoPlotY="true" yAxis="MaxMaxIdle normalisé" y="90" xMin="0.0" height="175" legend="false" xMax="10.0" yMin="0.0" width="230" xAxis="ticks" display="MaxMaxIdle normalisé">
       <setup></setup>
       <update></update>
@@ -177,7 +181,11 @@ end]]></code>
         <update>plot ((count patrouilleurs / count patches) * max-max-idle)</update>
       </pen>
     </plot>
-    <switch x="870" y="15" height="40" on="false" variable="cognitif" width="75" display="cognitif"></switch>
+    <chooser x="755" y="10" height="60" variable="Strategie" current="0" width="250" display="Strategie">
+      <choice type="string" value="aleatoire"></choice>
+      <choice type="string" value="heuristique"></choice>
+      <choice type="string" value="cognitif"></choice>
+    </chooser>
   </widgets>
   <info>## WHAT IS IT?
 
@@ -1076,4 +1084,33 @@ Et le comportement cognitif permettant d'utiliser une perception globale de l'en
     </shape>
   </linkShapes>
   <previewCommands>setup repeat 75 [ go ]</previewCommands>
+  <experiments>
+    <experiment name="experiment" repetitions="30" sequentialRunOrder="true" runMetricsEveryStep="false">
+      <setup>setup</setup>
+      <go>go</go>
+      <metrics>
+        <metric>max-max-idle</metric>
+        <metric>((count patrouilleurs / count patches) * max-max-idle)</metric>
+      </metrics>
+      <constants>
+        <enumeratedValueSet variable="strategie">
+          <value value="&quot;aleatoire&quot;"></value>
+          <value value="&quot;heuristique&quot;"></value>
+          <value value="&quot;cognitif&quot;"></value>
+        </enumeratedValueSet>
+        <enumeratedValueSet variable="nb_patrouilleurs">
+          <value value="1"></value>
+          <value value="2"></value>
+          <value value="4"></value>
+          <value value="8"></value>
+          <value value="16"></value>
+          <value value="32"></value>
+          <value value="64"></value>
+        </enumeratedValueSet>
+        <enumeratedValueSet variable="max_tick">
+          <value value="3000"></value>
+        </enumeratedValueSet>
+      </constants>
+    </experiment>
+  </experiments>
 </model>
