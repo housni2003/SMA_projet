@@ -1,161 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <model version="NetLogo 7.0.4" snapToGrid="true">
   <code><![CDATA[globals [
-  max-max-idle ; Enregistre la valeur maximale absolue observée
+  max-max-idle ; [Métrique globale] Mémorise le pire pic d'oisiveté absolu observé : MaxMaxIdle(G) = max_{t <= tf} (max_i Idle_t(i))
 ]
 
-breed [ patrouilleurs patrouilleur ]
+breed [ patrouilleurs patrouilleur ] ; [Déclaration de race/famille] Définit l'ensemble des agents mobiles (pluriel: patrouilleurs, singulier: patrouilleur)
 
-patrouilleurs-own [
-  id
+patrouilleurs-own [ ; [Variables propres à chaque agent patrouilleur]
+  id ; Identifiant unique de l'agent (copie de la primitive 'who' pour traçage et affichage)
 ]
 
-patches-own [
-  oisivete ; Temps écoulé depuis la dernière visite d'un agent
-  gain     ; Oisiveté perçue par le patrouilleur
-  cout     ; Distance calculée par rapport au patrouilleur
+patches-own [ ; [Variables d'état propres à chaque tuile/case de la grille]
+  oisivete ; Temps (en ticks) écoulé depuis la dernière visite d'un agent sur cette case (Idle_t(i))
+  gain     ; [Pour stratégie cognitive] Bénéfice perçu en visitant cette case (= son oisiveté actuelle)
+  cout     ; [Pour stratégie cognitive] Pénalité de déplacement (= distance géométrique entre l'agent et la case)
 ]
 
-to setup
-  clear-all        ; Réinitialise l'environnement (patches, agents, variables)
-  reset-ticks      ; Remet le compteur de temps à 0
+to setup ; [Procédure d'initialisation du monde] Exécutée une seule fois au clic sur le bouton 'setup'
+  clear-all        ; Réinitialise entièrement l'environnement : tue les agents, remet les cases à noir et les variables à 0
+  reset-ticks      ; Réinitialise l'horloge temporelle de simulation (ticks = 0) et met à jour les graphiques
   
-  set max-max-idle 0 ; Initialisation du record à 0
+  set max-max-idle 0 ; Initialise le record du pire cas absolu d'oisiveté à 0
   
-  ; Initialisation des tuiles
-  ask patches [
-    set oisivete 0
-    set gain 0
-    set cout 0
-    set plabel oisivete
+  ; Initialisation des 400 cases de la grille (20x20)
+  ask patches [ ; Demande à chaque tuile (patch) de la grille d'exécuter les instructions suivantes :
+    set oisivete 0 ; Au début (t = 0), aucune tuile n'est oisive : oisiveté mise à 0
+    set gain 0     ; Réinitialise la valeur de gain cognitif à 0
+    set cout 0     ; Réinitialise la valeur de coût cognitif à 0
+    set plabel oisivete ; 'plabel' affiche la valeur de l'oisiveté directement en texte sur la tuile à l'écran
   ]
   
-  ; Création des patrouilleurs selon la valeur sélectionnée dans l'interface
-  create-patrouilleurs nb_patrouilleurs [
-    set shape "airplane"
-    set size 1.2
-    set color yellow
+  ; Création et placement des agents patrouilleurs
+  create-patrouilleurs nb_patrouilleurs [ ; Crée le nombre d'agents défini par le sélecteur d'interface (1, 2, 4, 8, 16, 32 ou 64)
+    set shape "airplane" ; Forme visuelle de l'agent (avion pour bien visualiser son cap et son orientation)
+    set size 1.2         ; Définit la taille visuelle de l'icône de l'agent dans la vue graphique
+    set color yellow     ; Attribue la couleur jaune pour rendre les agents très visibles sur le fond sombre
     
-    set id who
-    set label id
-    set label-color white
+    set id who           ; Assigne l'identifiant unique interne NetLogo (who: 0, 1, 2...) à la variable id
+    set label id         ; Affiche le numéro de l'agent au-dessus de sa tête sur l'écran
+    set label-color white; Définit la couleur d'affichage du numéro de l'agent en blanc
     
-    ; Positionnement au centre du monde (0, 0)
-    setxy 9.5 9.5
+    ; Positionnement initial de départ : tous les patrouilleurs débutent au même point central
+    setxy 9.5 9.5        ; Place l'agent au centre géométrique exact de la grille [x: 0..19, y: 0..19] (19/2 = 9.5)
   ]
-end
+end ; Fin de la procédure setup
 
-to go
-  ; Arrêt de la simulation quand le nombre maximal de ticks est atteint
-  if ticks >= max_tick [
-    stop
+to go ; [Boucle principale de simulation] Exécutée à chaque pas de temps (tick) par le bouton 'go'
+  ; Condition d'arrêt de l'expérience
+  if ticks >= max_tick [ ; Vérifie si l'horloge a atteint la limite fixée (ex: 3000 ticks pour nos expérimentations)
+    stop ; Arrête immédiatement et définitivement la boucle de simulation
   ]
   
-  ; Incrémentation de l'oisiveté pour l'ensemble des tuiles
-  ask patches [
-    set oisivete oisivete + 1
-    set plabel oisivete
+  ; Dynamique temporelle de l'environnement : le temps s'écoule pour toutes les cases
+  ask patches [ ; Pour chacune des 400 tuiles de la grille :
+    set oisivete oisivete + 1 ; L'oisiveté augmente de +1 tick (la case attend depuis 1 pas supplémentaire)
+    set plabel oisivete       ; Met à jour le label affiché sur la tuile pour refléter la nouvelle oisiveté
   ]
   
-  ; Exécution du comportement selon la variable globale 'strategie'
-  ifelse strategie = "cognitif" [
-    foreach (sort patrouilleurs) [
-      patrouilleurCourant ->
-      reinitialiser-utilite
-      ; L'observateur calcule l'utilité des patches relative à cet agent
-      calculer-utilite patrouilleurCourant
-      ask patrouilleurCourant [ comportement-cognitif ]
+  ; Aiguillage décisionnel selon la stratégie sélectionnée dans l'interface
+  ifelse strategie = "cognitif" [ ; Si l'utilisateur a choisi la stratégie cognitive (planification globale)
+    ; Traitement séquentiel agent par agent car le champ d'utilité dépend de la position de chaque agent
+    foreach (sort patrouilleurs) [ ; 'sort' convertit l'agentset en liste ordonnée stable pour un parcours déterministe
+      patrouilleurCourant ->       ; Variable de boucle désignant l'agent actuellement évalué
+      reinitialiser-utilite        ; Réinitialise gain et coût de toutes les tuiles avant le calcul
+      ; L'observateur projette le champ d'utilité globale spécifique à la position de cet agent
+      calculer-utilite patrouilleurCourant ; Calcule pour chaque tuile : gain = oisivete et cout = distance à cet agent
+      ask patrouilleurCourant [ comportement-cognitif ] ; L'agent choisit sa cible optimale et avance d'un pas
     ]
   ] [
-    ; Comportements réactifs (heuristique locale ou aléatoire)
-    ask patrouilleurs [ comportement-reactif ]
+    ; Traitement des stratégies réactives locales (heuristique locale ou aléatoire pur)
+    ask patrouilleurs [ comportement-reactif ] ; Chaque agent décide et se déplace de façon autonome et décentralisée
   ]
   
-  ; Calcul du pire cas instantané MaxIdlet(G)
-  let max-idle-courant max [oisivete] of patches
+  ; Calcul du pire cas instantané : MaxIdle_t(G)
+  let max-idle-courant max [oisivete] of patches ; Détermine la valeur maximale d'oisiveté parmi les 400 tuiles à cet instant t
   
-  ; Mise à jour de MaxMaxIdle(G) si un nouveau record est atteint
-  if max-idle-courant > max-max-idle [
-    set max-max-idle max-idle-courant
+  ; Mémorisation du pire cas historique absolu : MaxMaxIdle(G)
+  if max-idle-courant > max-max-idle [ ; Si le pire cas de l'instant t est supérieur au record absolu précédent
+    set max-max-idle max-idle-courant  ; Enregistre le nouveau record absolu d'oisiveté maximale
   ]
   
-  ; Avance la simulation d'un pas
-  tick
-end
+  ; Progression de l'horloge
+  tick ; Fait avancer le compteur de simulation de 1 tick et rafraîchit les tracés des graphiques (plots)
+end ; Fin de la procédure go
 
-; -------------------------------------------------------------
-; COMPORTEMENT RÉACTIF (Aléatoire ou Heuristique locale)
-; -------------------------------------------------------------
+; -------------------------------------------------------------------------------------------------
+; COMPORTEMENT RÉACTIF : Décision locale à 1 pas sans carte globale (Aléatoire ou Heuristique)
+; -------------------------------------------------------------------------------------------------
 
-to comportement-reactif
-  let voisins neighbors4
+to comportement-reactif ; [Procédure exécutée par un agent patrouilleur]
+  let voisins neighbors4 ; 'neighbors4' retourne l'ensemble des 4 tuiles adjacentes orthogonales (Nord, Sud, Est, Ouest - sans diagonale)
   
-  if any? voisins [
-    let cible nobody
+  if any? voisins [ ; Sécurité aux frontières : vérifie qu'il existe bien des cases voisines accessibles
+    let cible nobody ; Déclare la variable locale 'cible' qui contiendra la tuile vers laquelle se déplacer
     
-    ifelse strategie = "heuristique" [
-      ; Heuristique : tuile voisine orthogonale avec l'oisiveté maximale
+    ifelse strategie = "heuristique" [ ; Cas de l'heuristique réactive locale :
+      ; 'max-one-of' choisit parmi les voisins la tuile qui a la plus forte valeur d'oisivete locale
+      ; Principe SMA : stigmergie répulsive indirecte (les cases visitées ont oisivete=0 donc repoussent les agents)
       set cible max-one-of voisins [ oisivete ]
     ] [
-      ; Aléatoire : tuile voisine prise au hasard
+      ; Cas de la stratégie aléatoire réactive :
+      ; 'one-of' tire au sort de manière équiprobable l'une des cases voisines (marche brownienne discrète)
       set cible one-of voisins
     ]
     
-    face cible
-    move-to cible
+    face cible ; Oriente l'angle de direction (heading) du patrouilleur vers le centre de la tuile cible
+    move-to cible ; Déplace instantanément l'agent sur la case cible choisie
     
-    reinitialiser-oisivete-courante
+    reinitialiser-oisivete-courante ; Remet à zéro l'oisiveté de la tuile atteinte pour signifier la visite
   ]
-end
+end ; Fin de la procédure comportement-reactif
 
-; -------------------------------------------------------------
-; COMPORTEMENT COGNITIF (Planification globale et utilité)
-; -------------------------------------------------------------
+; -------------------------------------------------------------------------------------------------
+; COMPORTEMENT COGNITIF : Décision globale basée sur la maximisation de l'utilité U = Gain - Coût
+; -------------------------------------------------------------------------------------------------
 
-to comportement-cognitif
-  ; 1. Choix de la tuile maximisant l'utilité (gain - cout)
-  let cible max-one-of patches [ gain - cout ]
+to comportement-cognitif ; [Procédure exécutée par un agent patrouilleur cognitif]
+  ; 1. Sélection de la cible globale maximisant la fonction d'utilité U(p) = gain(p) - cout(p)
+  ; Gain = oisiveté (urgence de patrouille) / Coût = distance géométrique (effort de trajet)
+  let cible max-one-of patches [ gain - cout ] ; Trouve la tuile sur l'ensemble de la grille offrant le meilleur compromis
   
-  ; 2. Recherche du pas optimal vers la cible
-  let prochain-pas bfs-to cible
+  ; 2. Pathfinding : recherche du premier pas pour se diriger vers cette cible optimale
+  let prochain-pas bfs-to cible ; Appelle la fonction de guidage pour choisir le voisin orthogonal le plus proche de la cible
   
-  ; 3. Déplacement
-  if prochain-pas != nobody [
-    face prochain-pas
-    move-to prochain-pas
+  ; 3. Déplacement physique de l'agent
+  if prochain-pas != nobody [ ; Si un pas valide vers la destination a été identifié
+    face prochain-pas ; Oriente le patrouilleur vers cette tuile voisine intermédiaire
+    move-to prochain-pas ; Déplace l'agent sur cette tuile voisine (avance d'une case)
   ]
   
-  ; 4. Remise à zéro de l'oisiveté sur la case atteinte
-  reinitialiser-oisivete-courante
-end
+  ; 4. Effet de la visite sur l'environnement
+  reinitialiser-oisivete-courante ; Réinitialise immédiatement l'oisiveté de la tuile foulée à 0
+end ; Fin de la procédure comportement-cognitif
 
-to calculer-utilite [ agent-cible ]
-  ask patches [
-    set gain oisivete
-    set cout distance agent-cible
-  ]
-end
+; -------------------------------------------------------------------------------------------------
+; FONCTIONS AUXILIAIRES : Utilité, Pathfinding et Réinitialisation
+; -------------------------------------------------------------------------------------------------
 
-to-report bfs-to [ destination ]
-  ; Si l'agent est déjà sur la case cible
-  if patch-here = destination [
-    report destination
+to calculer-utilite [ agent-cible ] ; [Procédure observateur] Calcule le champ de potentiel pour un agent spécifique
+  ask patches [ ; Parcourt l'ensemble des 400 tuiles de la grille :
+    set gain oisivete ; Le gain est l'oisiveté brute de la case (plus elle attend, plus il est urgent de la visiter)
+    set cout distance agent-cible ; Le coût est la distance euclidienne entre la case et l'agent qui doit s'y rendre
   ]
-  ; Sélectionne le voisin orthogonal qui réduit au maximum la distance vers la cible
+end ; Fin de calculer-utilite
+
+to-report bfs-to [ destination ] ; [Reporter agent] Retourne la case voisine orthogonale optimale vers la destination
+  ; Cas où l'agent se trouve déjà sur la case de destination :
+  if patch-here = destination [ ; 'patch-here' est la tuile actuellement sous l'agent
+    report destination ; Retourne la destination elle-même (l'agent n'a pas besoin de changer de case)
+  ]
+  ; Algorithme glouton de descente de distance (équivalent au plus court chemin BFS sur grille régulière 4-connexe sans obstacle) :
+  ; Parmi les 4 voisins orthogonaux (neighbors4), choisit celui dont la distance euclidienne à la cible est minimale
   report min-one-of neighbors4 [ distance destination ]
-end
+end ; Fin de bfs-to
 
-to reinitialiser-utilite
-  ask patches [
-    set gain 0
-    set cout 0
+to reinitialiser-utilite ; [Procédure utilitaire] Remet à zéro les variables de décision sur toutes les tuiles
+  ask patches [ ; Pour chacune des 400 tuiles :
+    set gain 0 ; Efface la valeur de gain précédente
+    set cout 0 ; Efface la valeur de coût précédente
   ]
-end
+end ; Fin de reinitialiser-utilite
 
-to reinitialiser-oisivete-courante
-  set oisivete 0
-  set plabel oisivete
-end]]></code>
+to reinitialiser-oisivete-courante ; [Procédure d'effet de visite] Réinitialise l'oisiveté locale après passage
+  set oisivete 0 ; L'agent vient de visiter cette case : son oisiveté retombe immédiatement à zéro
+  set plabel oisivete ; Met à jour l'affichage visuel sur la tuile pour afficher '0'
+end ; Fin de reinitialiser-oisivete-courante]]></code>
   <widgets>
     <view x="330" wrappingAllowedX="false" y="10" frameRate="30.0" minPycor="0" height="385" showTickCounter="true" patchSize="19.05" fontSize="10" wrappingAllowedY="false" width="385" tickCounterLabel="ticks" maxPycor="19" updateMode="1" maxPxcor="19" minPxcor="0"></view>
     <button x="35" y="30" height="40" disableUntilTicks="false" forever="false" kind="Observer" width="55" display="setup">setup</button>
