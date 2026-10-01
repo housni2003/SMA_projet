@@ -59,29 +59,29 @@ $$\widehat{\text{MaxMaxIdle}}(G) = \left(\frac{m}{n}\right) \times \text{MaxMaxI
 
 Tableau des résultats moyens ($\pm$ écart-type) calculés sur 30 exécutions par configuration pour $t_f = 3\,000$ ticks :
 
-| Stratégie | Nb agents ($m$) | Ratio $m/n$ | $MaxMaxIdle$ brut (ticks) | $\widehat{MaxMaxIdle}$ normalisé | Diagnostic |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **Aléatoire** | 1 | 0,0025 | $3\,000{,}0 \pm 0{,}0$ | **$7{,}50 \pm 0{,}00$** | Échec complet d'exploration |
-| **Heuristique** | 1 | 0,0025 | $1\,232{,}5 \pm 137{,}0$ | **$3{,}08 \pm 0{,}34$** | Acceptable |
-| **Cognitif** | 1 | 0,0025 | **$519{,}6 \pm 15{,}1$** | **$1{,}30 \pm 0{,}04$** | **Meilleur résultat à 1 agent** |
-| **Aléatoire** | 2 | 0,0050 | $2\,972{,}1 \pm 84{,}4$ | **$14{,}86 \pm 0{,}42$** | Dérive rapide |
-| **Heuristique** | 2 | 0,0050 | $671{,}2 \pm 85{,}9$ | **$3{,}36 \pm 0{,}43$** | Stable |
-| **Cognitif** | 2 | 0,0050 | **$475{,}3 \pm 47{,}6$** | **$2{,}38 \pm 0{,}24$** | Bon |
-| **Aléatoire** | 4 | 0,0100 | $2\,230{,}8 \pm 400{,}1$ | **$22{,}31 \pm 4{,}00$** | Inefficace |
-| **Heuristique** | 4 | 0,0100 | **$340{,}0 \pm 31{,}3$** | **$3{,}40 \pm 0{,}31$** | Stable |
-| **Cognitif** | 4 | 0,0100 | $375{,}0 \pm 40{,}8$ | **$3{,}75 \pm 0{,}41$** | Début de dépassement |
-| **Aléatoire** | 8 | 0,0200 | $1\,443{,}2 \pm 314{,}0$ | **$28{,}86 \pm 6{,}28$** | Mauvais |
-| **Heuristique** | 8 | 0,0200 | **$174{,}8 \pm 16{,}1$** | **$3{,}50 \pm 0{,}32$** | Stable |
-| **Cognitif** | 8 | 0,0200 | $303{,}7 \pm 27{,}6$ | **$6{,}07 \pm 0{,}55$** | Dégradation nette |
-| **Aléatoire** | 16 | 0,0400 | $779{,}4 \pm 145{,}4$ | **$31{,}18 \pm 5{,}82$** | Fort gaspillage |
-| **Heuristique** | 16 | 0,0400 | **$87{,}4 \pm 6{,}1$** | **$3{,}50 \pm 0{,}24$** | Quasi parfait |
-| **Cognitif** | 16 | 0,0400 | $252{,}8 \pm 28{,}2$ | **$10{,}11 \pm 1{,}13$** | Chute des performances |
-| **Aléatoire** | 32 | 0,0800 | $458{,}7 \pm 83{,}2$ | **$36{,}70 \pm 6{,}65$** | Rendement décroissant |
-| **Heuristique** | 32 | 0,0800 | **$46{,}1 \pm 5{,}2$** | **$3{,}69 \pm 0{,}42$** | Linéarité confirmée |
-| **Cognitif** | 32 | 0,0800 | $224{,}0 \pm 22{,}6$ | **$17{,}92 \pm 1{,}81$** | Effet troupeau sévère |
-| **Aléatoire** | 64 | 0,1600 | $235{,}5 \pm 52{,}3$ | **$37{,}67 \pm 8{,}37$** | Très mauvais rendement |
-| **Heuristique** | 64 | 0,1600 | **$27{,}4 \pm 2{,}8$** | **$4{,}38 \pm 0{,}44$** | **Champion absolu à 64 agents** |
-| **Cognitif** | 64 | 0,1600 | $204{,}8 \pm 18{,}1$ | **$32{,}77 \pm 2{,}89$** | Naufrage collectif |
+| Stratégie       | Nb agents ($m$) | Ratio $m/n$ | $MaxMaxIdle$ brut (ticks) | $\widehat{MaxMaxIdle}$ normalisé | Diagnostic                      |
+| :-------------- | :-------------: | :---------: | :-----------------------: | :------------------------------: | :------------------------------ |
+| **Aléatoire**   |        1        |   0,0025    |  $3\,000{,}0 \pm 0{,}0$   |     **$7{,}50 \pm 0{,}00$**      | Échec complet d'exploration     |
+| **Heuristique** |        1        |   0,0025    | $1\,232{,}5 \pm 137{,}0$  |     **$3{,}08 \pm 0{,}34$**      | Acceptable                      |
+| **Cognitif**    |        1        |   0,0025    | **$519{,}6 \pm 15{,}1$**  |     **$1{,}30 \pm 0{,}04$**      | **Meilleur résultat à 1 agent** |
+| **Aléatoire**   |        2        |   0,0050    |  $2\,972{,}1 \pm 84{,}4$  |     **$14{,}86 \pm 0{,}42$**     | Dérive rapide                   |
+| **Heuristique** |        2        |   0,0050    |   $671{,}2 \pm 85{,}9$    |     **$3{,}36 \pm 0{,}43$**      | Stable                          |
+| **Cognitif**    |        2        |   0,0050    | **$475{,}3 \pm 47{,}6$**  |     **$2{,}38 \pm 0{,}24$**      | Bon                             |
+| **Aléatoire**   |        4        |   0,0100    | $2\,230{,}8 \pm 400{,}1$  |     **$22{,}31 \pm 4{,}00$**     | Inefficace                      |
+| **Heuristique** |        4        |   0,0100    | **$340{,}0 \pm 31{,}3$**  |     **$3{,}40 \pm 0{,}31$**      | Stable                          |
+| **Cognitif**    |        4        |   0,0100    |   $375{,}0 \pm 40{,}8$    |     **$3{,}75 \pm 0{,}41$**      | Début de dépassement            |
+| **Aléatoire**   |        8        |   0,0200    | $1\,443{,}2 \pm 314{,}0$  |     **$28{,}86 \pm 6{,}28$**     | Mauvais                         |
+| **Heuristique** |        8        |   0,0200    | **$174{,}8 \pm 16{,}1$**  |     **$3{,}50 \pm 0{,}32$**      | Stable                          |
+| **Cognitif**    |        8        |   0,0200    |   $303{,}7 \pm 27{,}6$    |     **$6{,}07 \pm 0{,}55$**      | Dégradation nette               |
+| **Aléatoire**   |       16        |   0,0400    |   $779{,}4 \pm 145{,}4$   |     **$31{,}18 \pm 5{,}82$**     | Fort gaspillage                 |
+| **Heuristique** |       16        |   0,0400    |  **$87{,}4 \pm 6{,}1$**   |     **$3{,}50 \pm 0{,}24$**      | Quasi parfait                   |
+| **Cognitif**    |       16        |   0,0400    |   $252{,}8 \pm 28{,}2$    |     **$10{,}11 \pm 1{,}13$**     | Chute des performances          |
+| **Aléatoire**   |       32        |   0,0800    |   $458{,}7 \pm 83{,}2$    |     **$36{,}70 \pm 6{,}65$**     | Rendement décroissant           |
+| **Heuristique** |       32        |   0,0800    |  **$46{,}1 \pm 5{,}2$**   |     **$3{,}69 \pm 0{,}42$**      | Linéarité confirmée             |
+| **Cognitif**    |       32        |   0,0800    |   $224{,}0 \pm 22{,}6$    |     **$17{,}92 \pm 1{,}81$**     | Effet troupeau sévère           |
+| **Aléatoire**   |       64        |   0,1600    |   $235{,}5 \pm 52{,}3$    |     **$37{,}67 \pm 8{,}37$**     | Très mauvais rendement          |
+| **Heuristique** |       64        |   0,1600    |  **$27{,}4 \pm 2{,}8$**   |     **$4{,}38 \pm 0{,}44$**      | **Champion absolu à 64 agents** |
+| **Cognitif**    |       64        |   0,1600    |   $204{,}8 \pm 18{,}1$    |     **$32{,}77 \pm 2{,}89$**     | Naufrage collectif              |
 
 ---
 
@@ -216,14 +216,14 @@ end
 
 ## 5. Tableau Synthétique Comparatif
 
-| Propriété | Réactif Aléatoire | Heuristique Locale | Cognitif (Gain - Coût) |
-| :--- | :---: | :---: | :---: |
-| **Complexité par agent** | $\mathcal{O}(1)$ | $\mathcal{O}(1)$ | $\mathcal{O}(n)$ ($400$ tuiles) |
-| **Volume de messages** | Nul | Nul (Stigmergie) | Nul |
-| **Performance à $m=1$** | $3\,000$ (Échec) | $1\,232{,}5$ (Moyen) | **$519{,}6$ (Excellent)** |
-| **Performance à $m=64$** | $235{,}5$ (Médiocre) | **$27{,}4$ (Exceptionnel)** | $204{,}8$ (Médiocre) |
-| **Scalabilité ($\widehat{MMI}$)** | Dégradation continue ($7{,}5 \to 37{,}7$) | **Optimale ($\approx 3{,}5 - 4{,}4$)** | Explosion ($1{,}3 \to 32{,}8$) |
-| **Comportement émergent** | Errance / Piégeage | **Dispersion auto-organisée** | **Attroupement néfaste (*Herding*)** |
+| Propriété                         |             Réactif Aléatoire             |           Heuristique Locale           |        Cognitif (Gain - Coût)        |
+| :-------------------------------- | :---------------------------------------: | :------------------------------------: | :----------------------------------: |
+| **Complexité par agent**          |             $\mathcal{O}(1)$              |            $\mathcal{O}(1)$            |   $\mathcal{O}(n)$ ($400$ tuiles)    |
+| **Volume de messages**            |                    Nul                    |            Nul (Stigmergie)            |                 Nul                  |
+| **Performance à $m=1$**           |             $3\,000$ (Échec)              |          $1\,232{,}5$ (Moyen)          |      **$519{,}6$ (Excellent)**       |
+| **Performance à $m=64$**          |           $235{,}5$ (Médiocre)            |      **$27{,}4$ (Exceptionnel)**       |         $204{,}8$ (Médiocre)         |
+| **Scalabilité ($\widehat{MMI}$)** | Dégradation continue ($7{,}5 \to 37{,}7$) | **Optimale ($\approx 3{,}5 - 4{,}4$)** |    Explosion ($1{,}3 \to 32{,}8$)    |
+| **Comportement émergent**         |            Errance / Piégeage             |     **Dispersion auto-organisée**      | **Attroupement néfaste (*Herding*)** |
 
 ---
 
