@@ -220,35 +220,100 @@ Tout d'abord le comportement aléatoire qui fait que le patrouilleur choisi alé
 
 Le comportement heuristique permet au patrouilleur de choisir la case voisine avec la plus grande oisiveté
 
-Et le comportement cognitif permettant d'utiliser une perception globale de l'environnement qui permet de sélectionner la cible en focntion de son utilité et de se déplacer vers elle via le plus court chemin
+Et le comportement cognitif permettant d'utiliser une perception globale de l'environnement qui permet de sélectionner la cible en fonction de son utilité et de se déplacer vers elle via le plus court chemin
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+L'onglet Interface permet de contrôler les paramètres de la simulation.
 
-## THINGS TO NOTICE
+```nb_patrouilleurs```
 
-(suggested things for the user to notice while running the model)
+Détermine le nombre de patrouilleurs présents dans l'environnement.
+
+Plus le nombre de patrouilleurs est important, plus plusieurs zones peuvent être surveillées simultanément.
+
+Ce paramètre peut être utilisé pour étudier l'influence du nombre d'agents sur l'oisiveté maximale.
+
+```max_tick```
+
+Détermine le nombre maximal de ticks pendant lesquels la simulation est exécutée.
+
+Lorsque le nombre de ticks atteint cette valeur, la simulation s'arrête automatiquement.
+
+```strategie```
+
+Permet de sélectionner la stratégie utilisée par les patrouilleurs.
+
+Les valeurs disponibles sont :
+
+aleatoire : déplacement aléatoire ;
+heuristique : déplacement vers le voisin ayant la plus grande oisiveté ;
+cognitif : sélection globale d'une cible selon une fonction d'utilité.
+
+La stratégie sélectionnée est appliquée à tous les patrouilleurs.
+
+Bouton ```SETUP```
+
+Initialise ou réinitialise complètement la simulation.
+
+Il :
+
+supprime les anciens patrouilleurs ;
+remet toutes les cases à une oisiveté de 0 ;
+réinitialise MaxMaxIdle ;
+recrée les patrouilleurs ;
+place les patrouilleurs au centre de l'environnement ;
+remet le compteur de ticks à 0.
+
+Bouton ```GO```
+
+Lance la simulation.
+
+À chaque activation, le modèle exécute un nouveau tick et les patrouilleurs se déplacent selon la stratégie sélectionnée.
+
+Bouton ```GO once```
+
+Lance un tick de simulation.
+
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+Plusieurs expériences peuvent être réalisées afin de comparer les stratégies.
 
-## EXTENDING THE MODEL
+### Influence du nombre de patrouilleurs
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+Faire varier nb_patrouilleurs avec une même stratégie.
 
-## NETLOGO FEATURES
+Par exemple :
 
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+1 patrouilleur
+2 patrouilleurs 
+4 patrouilleurs 
+8 patrouilleurs 
+16 patrouilleurs 
+32 patrouilleurs 
+64 patrouilleurs.
 
-## RELATED MODELS
+Observer l'évolution de MaxMaxIdle lorsque le nombre de patrouilleurs augmente.
 
-(models in the NetLogo Models Library and elsewhere which are of related interest)
+
+### Comparaison des stratégies
+
+Pour un même nombre de patrouilleurs et un même nombre de ticks, exécuter successivement :
+
+la stratégie aléatoire ;
+la stratégie heuristique ;
+la stratégie cognitive.
+
+Comparer ensuite les valeurs de MaxMaxIdle obtenues.
+
+### Influence de la durée de simulation
+
+Modifier max_tick afin d'observer l'évolution de l'oisiveté sur des simulations courtes et longues.
 
 ## CREDITS AND REFERENCES
 
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Modèle réalisé dans le cadre d'un travail universitaire à Polytech Lyon sur les systèmes multi-agents dans une matière dirigée par Maxime Morge
 </info>
   <turtleShapes>
     <shape name="default" rotatable="true" editableColorIndex="0">
